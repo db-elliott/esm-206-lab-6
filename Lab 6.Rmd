@@ -19,9 +19,10 @@ library(equatiomatic)
 Mann-Whitney U (non-parametric alternative to an unpaired 2-sample t-test).
 
 H0: Equal ranks (or medians)
+
 HA: Ranks (or medians) are NOT equal
 
-### Create Samples ###
+#### Create Samples
 
 'set.seed()' to create "pseudo-random, but reproducible samples"
 
@@ -46,16 +47,16 @@ Try a t-test so we can compare the results:
 
 ```{r}
 
-ttest <- t.test(gp_1, gp_2)
+t_test <- t.test(gp_1, gp_2)
 
 #If these data were paired, I can just add the argument 'paired = TRUE' within the t.test() function
 ```
 
-This p-value means that IF our samples are drawn from populations with the same mean (i.e. if the null hypothesis is true), there is `r round(ttest$p.value, 2)` probability of finding sample means *at least as different* as mine by random chance.
+This p-value means that IF our samples are drawn from populations with the same mean (i.e. if the null hypothesis is true), there is `r round(t_test$p.value, 2)` probability of finding sample means *at least as different* as mine by random chance.
 
 [A more comprehensive explanation of difference between groups... actual means, data spread, effect size]... there is no significant difference (t(df) = t-stat value, p = #).
 
-### Mann-Whitney U Rank-Based Test
+#### Mann-Whitney U Rank-Based Test
 
 We use the 'wilcox.test' function to perform a two-sample t-test
 
@@ -68,4 +69,65 @@ This p-value means that if our samples are drawn from populations with the same 
 
 No significant difference in medians (Mann-Whitney U; U = `r mwu$statistic`, p = `r round(mwu$p.value, 2)`).
 
-The medians of group A (M = 22.4 g) and group B (M = )
+The medians of group A (M = 22.4 g) and group B (M = 31.2 g) did not differ significantly (Mann-Whitney U; ...).
+
+## Simple Linear Regression 
+
+Two *continuous quantitative* variables that you are trying to understand the relationship between, and you think that a linear relationship makes sense.
+
+Use the 'penguins' data from {palmerpenguins}, exploring flipper length (x) vs body mass (g).
+
+```{r}
+
+#Use view(penguins) to look at data
+# Make an exploratory scatterplot of flipper length vs body mass
+
+ggplot(data = penguins,
+      aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+#### Find the Model Estimates (Coefficients)
+
+Use the 'lm()' function for linear model.
+
+```{r}
+
+penguin_lm <- lm(body_mass_g ~ flipper_length_mm, data = penguins)
+```
+
+Model Coefficients: `r penguin_lm$coefficients`
+Flipper Length Coefficient: `r penguin_lm$coefficients[2]`
+
+#### Use 'broom::tidy()' to get stats on the linear regression
+
+```{r}
+
+penguin_lm_tidy <- tidy(penguin_lm)
+```
+
+#### Use 'broom::glance()' to get output of model fit and statistical significance
+
+```{r}
+
+penguin_lm_glance <- glance(penguin_lm)
+```
+
+#### Use equatiomatic::extract_eq() to return model in LaTex
+
+```{r}
+
+extract_eq(model = penguin_lm, use_coefs = TRUE)
+```
+
+#### Use plot() function to automatically produce diagnostic plots
+
+```{r}
+
+plot(penguin_lm)
+```
+
+
+
+$\frac{apples}{bananas}$
